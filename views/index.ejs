@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Ajx 上传文件</title>
+  <style>
+    .progressBar{
+      width: 150px;
+      height: 15px;
+      border: 1px solid red;
+      -webkit-border-radius:5px;
+      border-radius:5px;
+    }
+    .bar{
+      width: 0;
+      height: 100%;
+      background: #08d09a;
+      border-radius: 5px;
+      line-height: 0;
+      margin: 0;
+    }
+    #fileInputElement{
+      display: none;
+    }
+    #submit{
+      border: 0;
+      padding: 10px 20px;
+      background-color: green;
+      color:#fff;
+    }
+  </style>
+</head>
+<body>
+  <button id="submit">提交</button>
+  <input type="text" id="filename" placeholder="上传文件名">
+  <input type="file" name="file" id="fileInputElement"/>
+  <div class="progressBar" style="display:none;">
+    <p class="bar"></p>
+  </div>
+  <script>
+    window.onload=function(){
+      let btn=document.getElementById('submit');
+      let fileInputElement=document.getElementById('fileInputElement');
+      let bar=document.querySelector('.bar');
+      let progressBar=document.querySelector('.progressBar');
+      btn.addEventListener('click',function(){
+        // 触发了被隐藏的文件框的点击事件用于上传文件
+        fileInputElement.click();
+      },false)
+      // change事件 监听变化
+      fileInputElement.addEventListener('change',function(event){
+        // formData()对象可以用键值对的方式模拟表单控件可以使用xhr的send()方法提交yu
+        // submit()提交的功能一样 可异步上传二进制文件
+        let oMyForm=new FormData();
+        // append()添加表单字段
+        oMyForm.append('fname',document.getElementById('filename').value);
+        oMyForm.append('userfile',fileInputElement.files[0]);
+        let xhr=new XMLHttpRequest();
+        // 发送post请求给后台 后台给予响应
+        xhr.open('POST','/formupload');
+        progressBar.style.display='block';
+        xhr.upload.onprogress=function(e){
+          bar.style.width=(e.loaded/e.total)*100+'%';
+        }
+        xhr.upload.onloadend=function(e){
+          alert('上传成功');
+          setTimeout(()=>{
+            progressBar.style.display='none';
+            bar.style.width=0;
+          },2000)
+        }
+        // 提交表单
+        xhr.send(oMyForm);
+      },false)
+    }
+
+  </script>
+</body>
+</html>
